@@ -1,8 +1,8 @@
 package servlet;
 
-public class DefaultServletManager extends AServletManager {
+public class UsersServletManager extends AServletManager {
 
-	public DefaultServletManager(String filePath) {
+	public UsersServletManager(String filePath) {
 		super(filePath);
 		// TODO Auto-generated constructor stub
 	}

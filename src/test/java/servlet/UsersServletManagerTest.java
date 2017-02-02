@@ -2,9 +2,9 @@ package servlet;
 
 import static org.junit.Assert.assertTrue;
 
-public class Test {
+public class UsersServletManagerTest {
 
-	public Test() {
+	public UsersServletManagerTest() {
 		assertTrue(true);
 	}
 }
