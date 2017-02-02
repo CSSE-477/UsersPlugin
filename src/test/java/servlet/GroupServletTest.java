@@ -1,6 +1,6 @@
 package servlet;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -15,14 +15,14 @@ import protocol.HttpResponse;
 import protocol.HttpResponseBuilder;
 import protocol.Protocol;
 
-public class UsersServletTest {
-	
+public class GroupServletTest {
+
 	@Test
 	public void testGet() throws Exception{
-		AHttpServlet servlet = new UsersServlet("Not Used");
+		AHttpServlet servlet = new GroupsServlet("Not Used");
 		servlet.init();
 		
-		String requestLine = "GET /userapp/users/1 HTTP/1.1\r";
+		String requestLine = "GET /userapp/groups/1 HTTP/1.1\r\n";
 		InputStream in = new ByteArrayInputStream(requestLine.getBytes());
 		HttpRequest req = HttpRequest.read(in);
 		HttpResponseBuilder builder = new HttpResponseBuilder();
@@ -32,18 +32,25 @@ public class UsersServletTest {
 		
 		assertEquals(200, response.getStatus());
 		String jsonResponse = response.getBody();
+		System.out.println(jsonResponse);
 		Gson gson = new Gson();
-		Person p = (Person) gson.fromJson(jsonResponse, Person.class);
-		Person expected = new Person("John", "Doe", "7654321", "1243 Main Street");
-		assertEquals(expected, p);
+		Group actual = (Group) gson.fromJson(jsonResponse, Group.class);
+		
+		Person p1 = new Person("Adam", "Smith", "6143612", "1234 Street Road");
+		Person p2 = new Person("Some", "Guy", "4123651", "1 1st Street");
+		Group expected = new Group();
+		expected.addMember(p1);
+		expected.addMember(p2);
+		
+		assertEquals(expected, actual);
 	}
 	
 	@Test
 	public void testHead() throws Exception{
-		AHttpServlet servlet = new UsersServlet("Not Used");
+		AHttpServlet servlet = new GroupsServlet("Not Used");
 		servlet.init();
 		
-		String requestLine = "HEAD /userapp/users/1 HTTP/1.1\r\n";
+		String requestLine = "HEAD /userapp/groups/1 HTTP/1.1\r\n";
 		InputStream in = new ByteArrayInputStream(requestLine.getBytes());
 		HttpRequest req = HttpRequest.read(in);
 		HttpResponseBuilder builder = new HttpResponseBuilder();
@@ -54,21 +61,22 @@ public class UsersServletTest {
 		assertEquals(200, response.getStatus());
 		Protocol proto = Protocol.getProtocol();
 		assertEquals(proto.getStringRep(proto.getCodeKeyword(200)), response.getPhrase());
-		assertEquals(3, Integer.parseInt(response.getHeader().get("Num-Users")));
+		assertEquals(1, Integer.parseInt(response.getHeader().get("Num-Groups")));
+		assertEquals(2, Integer.parseInt(response.getHeader().get("Num-Users-In-Group")));
 	}
 	
 	@Test
-	public void testPost() throws Exception{
-		AHttpServlet servlet = new UsersServlet("Not Used");
+	public void testPostOnExistingGroup() throws Exception {
+		AHttpServlet servlet = new GroupsServlet("Not Used");
 		servlet.init();
 		
-		String requestLine = "POST /userapp/users/1 HTTP/1.1\r\n";	
+		String requestLine = "POST /userapp/groups/1 HTTP/1.1\r\n";	
 		
 		InputStream in = new ByteArrayInputStream(requestLine.getBytes());
 		HttpRequest req = HttpRequest.read(in);
 		HttpResponseBuilder builder = new HttpResponseBuilder();
 		
-		Person samplePerson = new Person("", "", "", "1243 Changed Street");
+		Person samplePerson = new Person("Steve", "Trotta", "???????", "Somewhere in Indiana?");
 		Gson personGson = new Gson();
 		String reqBody = personGson.toJson(samplePerson);
 		
@@ -84,19 +92,26 @@ public class UsersServletTest {
 		Protocol proto = Protocol.getProtocol();
 		assertEquals(proto.getStringRep(proto.getCodeKeyword(200)), response.getPhrase());
 		
-		Person expectedPerson = new Person("John", "Doe", "7654321", "1243 Changed Street");
-		String expected = new Gson().toJson(expectedPerson);
+		Group expected = new Group();
+		Person p1 = new Person("Adam", "Smith", "6143612", "1234 Street Road");
+		Person p2 = new Person("Some", "Guy", "4123651", "1 1st Street");
+		expected.addMember(p1);
+		expected.addMember(p2);
+		expected.addMember(samplePerson);
 		
+		String jsonResponse = response.getBody();
+		Gson gson = new Gson();
+		Group actual = (Group) gson.fromJson(jsonResponse, Group.class);
 		
-		assertEquals(expected, response.getBody());
+		assertEquals(expected, actual);
 	}
 	
 	@Test
-	public void testPut() throws Exception {
-		AHttpServlet servlet = new UsersServlet("Not Used");
+	public void testPostOnNewGroup() throws Exception {
+		AHttpServlet servlet = new GroupsServlet("Not Used");
 		servlet.init();
 		
-		String requestLine = "PUT /userapp/users/1 HTTP/1.1\r\n";	
+		String requestLine = "POST /userapp/groups/2 HTTP/1.1\r\n";	
 		
 		InputStream in = new ByteArrayInputStream(requestLine.getBytes());
 		HttpRequest req = HttpRequest.read(in);
@@ -105,6 +120,43 @@ public class UsersServletTest {
 		Person samplePerson = new Person("Steve", "Trotta", "???????", "Somewhere in Indiana?");
 		Gson personGson = new Gson();
 		String reqBody = personGson.toJson(samplePerson);
+		
+		Field body = req.getClass().getDeclaredField("body");
+		body.setAccessible(true);
+		body.set(req,reqBody.toCharArray());
+		
+		
+		servlet.doPost(req, builder);
+		HttpResponse response = builder.generateResponse();
+		
+		assertEquals(200, response.getStatus());
+		Protocol proto = Protocol.getProtocol();
+		assertEquals(proto.getStringRep(proto.getCodeKeyword(200)), response.getPhrase());
+		
+		Group expected = new Group(samplePerson);
+		
+		String jsonResponse = response.getBody();
+		Gson gson = new Gson();
+		Group actual = (Group) gson.fromJson(jsonResponse, Group.class);
+		
+		assertEquals(expected, actual);
+	}
+	
+	@Test
+	public void testPut() throws Exception {
+		AHttpServlet servlet = new GroupsServlet("Not Used");
+		servlet.init();
+		
+		String requestLine = "PUT /userapp/groups/2 HTTP/1.1\r\n";	
+		
+		InputStream in = new ByteArrayInputStream(requestLine.getBytes());
+		HttpRequest req = HttpRequest.read(in);
+		HttpResponseBuilder builder = new HttpResponseBuilder();
+		
+		Person samplePerson = new Person("Steve", "Trotta", "???????", "Somewhere in Indiana?");
+		Group sampleGroup = new Group(samplePerson);
+		Gson groupGson = new Gson();
+		String reqBody = groupGson.toJson(sampleGroup);
 		
 		Field body = req.getClass().getDeclaredField("body");
 		body.setAccessible(true);
@@ -120,7 +172,7 @@ public class UsersServletTest {
 		
 		assertEquals(reqBody, response.getBody());
 		
-		String getRequest = "GET /userapp/users/1 HTTP/1.1\r\n";
+		String getRequest = "GET /userapp/groups/2 HTTP/1.1\r\n";
 		in = new ByteArrayInputStream(getRequest.getBytes());
 		req = HttpRequest.read(in);
 		builder = new HttpResponseBuilder();
@@ -133,17 +185,16 @@ public class UsersServletTest {
 		assertEquals(200, responseGet.getStatus());
 		String jsonResponse = responseGet.getBody();
 		Gson gson = new Gson();
-		Person p = (Person) gson.fromJson(jsonResponse, Person.class);
-		Person expected = new Person("Steve", "Trotta", "???????", "Somewhere in Indiana?");
-		assertEquals(expected, p);
+		Group actual = (Group) gson.fromJson(jsonResponse, Group.class);
+		assertEquals(sampleGroup, actual);
 	}
 	
 	@Test
 	public void testDelete() throws Exception {
-		AHttpServlet servlet = new UsersServlet("Not Used");
+		AHttpServlet servlet = new GroupsServlet("Not Used");
 		servlet.init();
 		
-		String requestLine = "DELETE /userapp/users/1 HTTP/1.1\r\n";	
+		String requestLine = "DELETE /userapp/groups/1 HTTP/1.1\r\n";	
 		
 		InputStream in = new ByteArrayInputStream(requestLine.getBytes());
 		HttpRequest req = HttpRequest.read(in);
@@ -157,7 +208,7 @@ public class UsersServletTest {
 		assertEquals(proto.getStringRep(proto.getCodeKeyword(204)), response.getPhrase());
 		
 		//GET it back out, test that it deleted to datastore
-		String deleteRequestLine = "GET /userapp/users/1 HTTP/1.1\r\n";
+		String deleteRequestLine = "GET /userapp/groups/1 HTTP/1.1\r\n";
 		in = new ByteArrayInputStream(deleteRequestLine.getBytes());
 		req = HttpRequest.read(in);
 		builder = new HttpResponseBuilder();
@@ -166,7 +217,6 @@ public class UsersServletTest {
 		response = builder.generateResponse();
 		
 		assertEquals(404, response.getStatus());
-		assertEquals(proto.getStringRep(proto.getCodeKeyword(404)), response.getPhrase());
 	}
 
 }

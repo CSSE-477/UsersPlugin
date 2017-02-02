@@ -1,9 +1,11 @@
 package servlet;
 
+import java.io.InputStream;
+
 public class UsersServletManager extends AServletManager {
 	
-	public UsersServletManager(String filePath) {
-		super(filePath);
+	public UsersServletManager(String filePath, InputStream configStream) {
+		super(filePath, configStream);
 		// nothing to do 
 	}
 

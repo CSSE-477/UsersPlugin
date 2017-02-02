@@ -5,6 +5,29 @@ import java.util.List;
 
 public class Group {
 	
+	private List<Person> members;
+
+	public Group() {
+		this.members = new ArrayList<Person>();
+	}
+	
+	public Group(Person p) {
+		this.members = new ArrayList<Person>();
+		this.members.add(p);
+	}
+
+	public Person getMember(int i) {
+		return this.members.get(i);
+	}
+	
+	public void addMember(Person p) {
+		this.members.add(p);
+	}
+	
+	public int getSize() {
+		return members.size();
+	}
+	
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
@@ -42,22 +65,5 @@ public class Group {
 		} else if (!members.equals(other.members))
 			return false;
 		return true;
-	}
-
-	private List<Person> members;
-
-	public Group() {}
-	
-	public Group(Person p) {
-		this.members = new ArrayList<Person>();
-		this.members.add(p);
-	}
-
-	public Person getMember(int i) {
-		return this.members.get(i);
-	}
-	
-	public void addMember(Person p) {
-		this.members.add(p);
 	}
 }

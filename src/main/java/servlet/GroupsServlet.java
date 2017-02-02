@@ -10,25 +10,28 @@ import protocol.HttpResponseBuilder;
 import protocol.Protocol;
 import utils.SwsLogger;
 
-public class UsersServlet extends AHttpServlet {
+public class GroupsServlet extends AHttpServlet {
 
-	private Map<Integer, Person> usersMap;
+	private Map<Integer, Group> groupsMap;
 
-	public UsersServlet(String resourcePath) {
+	public GroupsServlet(String resourcePath) {
 		super(resourcePath);
 	}
 
 	@Override
 	public void init() {
-		this.usersMap = new HashMap<Integer, Person>();
-		this.usersMap.put(0, new Person("John", "Smith", "1234567", "1234 Cherry Lane"));
-		this.usersMap.put(1, new Person("John", "Doe", "7654321", "1243 Main Street"));
-		this.usersMap.put(2, new Person("Tayler", "How", "2628516", "Somewhere in Hawaii"));
+		Person p1 = new Person("Adam", "Smith", "6143612", "1234 Street Road");
+		Person p2 = new Person("Some", "Guy", "4123651", "1 1st Street");
+		this.groupsMap = new HashMap<Integer, Group>();
+		Group g1 = new Group();
+		g1.addMember(p1);
+		g1.addMember(p2);
+		this.groupsMap.put(1, g1);
 	}
 
 	@Override
 	public void destroy() {
-		this.usersMap.clear();
+		this.groupsMap.clear();
 	}
 
 	@Override
@@ -37,23 +40,24 @@ public class UsersServlet extends AHttpServlet {
 		try {
 			String arg = request.getUri().toString().split("/")[3];
 			Integer index = Integer.parseInt(arg);
-			Person p = this.usersMap.get(index);
-			if (p == null) {
+			Group g = this.groupsMap.get(index);
+			if (g == null) {
 				responseBuilder.setStatus(404).setPhrase(protocol.getStringRep(protocol.getCodeKeyword(404)));
-				SwsLogger.accessLogger.info("Unable to find user " + index + " sending 404 response");
+				SwsLogger.accessLogger.info("Unable to find group " + index + " sending 404 response");
 				return;
 			}
 			Gson responseGson = new Gson();
-			String responseBody = responseGson.toJson(p);
+			String responseBody = responseGson.toJson(g);
 
 			responseBuilder.setStatus(200).setPhrase(protocol.getStringRep(protocol.getCodeKeyword(200)))
 					.setBody(responseBody);
-			SwsLogger.accessLogger.info("Sending 200OK for GET request to user " + index);
+			SwsLogger.accessLogger.info("Sending 200OK for GET request to group " + index);
 			return;
 		} catch (IndexOutOfBoundsException e) {
 			responseBuilder.setStatus(400).setPhrase(protocol.getStringRep(protocol.getCodeKeyword(400)));
 			SwsLogger.errorLogger.error("Unable to parse HTTP request. Sending 400 Bad Request.");
 		}
+
 	}
 
 	@Override
@@ -62,16 +66,16 @@ public class UsersServlet extends AHttpServlet {
 		try {
 			String arg = request.getUri().toString().split("/")[3];
 			Integer index = Integer.parseInt(arg);
-			Person p = this.usersMap.get(index);
-			if (p != null) {
+			Group g = this.groupsMap.get(index);
+			if (g != null) {
 				responseBuilder.setStatus(200).setPhrase(protocol.getStringRep(protocol.getCodeKeyword(200)))
-						.putHeader("Num-Users", this.usersMap.size() + "").putHeader("First Name", p.getFirstName())
-						.putHeader("Last Name", p.getLastName()).putHeader("Phone Num.", p.getPhoneNumber());
-				SwsLogger.accessLogger.info("Sending 200OK for HEAD request to user " + index);
+						.putHeader("Num-Groups", this.groupsMap.size() + "")
+						.putHeader("Num-Users-In-Group", g.getSize() + "");
+				SwsLogger.accessLogger.info("Sending 200OK for HEAD request to group " + index);
 				return;
 			}
 			responseBuilder.setStatus(404).setPhrase(protocol.getStringRep(protocol.getCodeKeyword(404)));
-			SwsLogger.accessLogger.info("Unable to find user " + index + " sending 404 response");
+			SwsLogger.accessLogger.info("Unable to find group " + index + ". Sending 404 response");
 			return;
 		} catch (IndexOutOfBoundsException e) {
 			responseBuilder.setStatus(400).setPhrase(protocol.getStringRep(protocol.getCodeKeyword(400)));
@@ -89,20 +93,16 @@ public class UsersServlet extends AHttpServlet {
 			String body = new String(request.getBody());
 			Gson gson = new Gson();
 			Person p = (Person) gson.fromJson(body, Person.class);
+			System.out.println(p.toString());
 
-			Person p2 = this.usersMap.get(index);
-
-			if (p.getFirstName() != null && !p.getFirstName().equals(""))
-				p2.setFirstName(p.getFirstName());
-			if (p.getLastName() != null && !p.getLastName().equals(""))
-				p2.setLastName(p.getLastName());
-			if (p.getPhoneNumber() != null && !p.getPhoneNumber().equals(""))
-				p2.setPhoneNumber(p.getPhoneNumber());
-			if (p.getAddress() != null && !p.getAddress().equals(""))
-				p2.setAddress(p.getAddress());
-
+			if(this.groupsMap.get(index) != null) {
+				this.groupsMap.get(index).addMember(p);
+			}
+			else {
+				this.groupsMap.put(index, new Group(p));
+			}
 			Gson responseGson = new Gson();
-			String responseBody = responseGson.toJson(p2);
+			String responseBody = responseGson.toJson(this.groupsMap.get(index));
 
 			responseBuilder.setStatus(200).setPhrase(protocol.getStringRep(protocol.getCodeKeyword(200)))
 					.setBody(responseBody);
@@ -122,23 +122,24 @@ public class UsersServlet extends AHttpServlet {
 
 			String body = new String(request.getBody());
 			Gson gson = new Gson();
-			Person p = (Person) gson.fromJson(body, Person.class);
+			Group g = (Group) gson.fromJson(body, Group.class);
 
-			if (this.usersMap.containsKey(index))
-				this.usersMap.remove(index);
-			this.usersMap.put(index, p);
+			if (this.groupsMap.containsKey(index))
+				this.groupsMap.remove(index);
+			this.groupsMap.put(index, g);
 
 			Gson responseGson = new Gson();
-			String responseBody = responseGson.toJson(p);
+			String responseBody = responseGson.toJson(this.groupsMap.get(index));
 
 			responseBuilder.setStatus(200).setPhrase(protocol.getStringRep(protocol.getCodeKeyword(200)))
 					.setBody(responseBody);
-			SwsLogger.accessLogger.info("Replaced user " + index + ". Sending 200 OK");
+			SwsLogger.accessLogger.info("Replaced Group " + index + ". Sending 200 OK");
 			return;
 		} catch (IndexOutOfBoundsException e) {
 			responseBuilder.setStatus(400).setPhrase(protocol.getStringRep(protocol.getCodeKeyword(400)));
 			SwsLogger.errorLogger.error("Unable to parse HTTP request. Sending 400 Bad Request.");
 		}
+
 	}
 
 	@Override
@@ -147,11 +148,11 @@ public class UsersServlet extends AHttpServlet {
 		try {
 			String arg = request.getUri().toString().split("/")[3];
 			Integer index = Integer.parseInt(arg);
-			Person p = this.usersMap.get(index);
-			if (p != null) {
-				this.usersMap.remove(index);
+			Group g = this.groupsMap.get(index);
+			if (g != null) {
+				this.groupsMap.remove(index);
 				responseBuilder.setStatus(204).setPhrase(protocol.getStringRep(protocol.getCodeKeyword(204)));
-				SwsLogger.accessLogger.info("Sending 204 NO CONTENT for DELETE request to user " + index);
+				SwsLogger.accessLogger.info("Sending 204 NO CONTENT for DELETE request to Group " + index);
 				return;
 			}
 			responseBuilder.setStatus(404).setPhrase(protocol.getStringRep(protocol.getCodeKeyword(404)));
@@ -162,5 +163,4 @@ public class UsersServlet extends AHttpServlet {
 			SwsLogger.errorLogger.error("Unable to parse HTTP request. Sending 400 Bad Request.");
 		}
 	}
-
 }
