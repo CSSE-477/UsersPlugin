@@ -81,19 +81,20 @@ public class UsersServlet extends AHttpServlet {
 	public void doPost(HttpRequest request, HttpResponseBuilder responseBuilder) {
 		Protocol protocol = Protocol.getProtocol();
 		try {
+			System.out.println(request.toString());
 			String arg = request.getUri().toString().split("/")[3];
 			Integer index = Integer.parseInt(arg);
 			
 			String body = new String(request.getBody());
 			Gson gson = new Gson();
 			Person p = (Person) gson.fromJson(body, Person.class);
-			
+		
 			Person p2 = this.usersMap.get(index);
 			
-			if (!p.getFirstName().equals("")) p2.setFirstName(p.getFirstName());
-			if (!p.getLastName().equals("")) p2.setLastName(p.getLastName());
-			if (!p.getPhoneNumber().equals("")) p2.setPhoneNumber(p.getPhoneNumber());
-			if (!p.getAddress().equals("")) p2.setAddress(p.getAddress());
+			if (p.getFirstName() != null && !p.getFirstName().equals("")) p2.setFirstName(p.getFirstName());
+			if (p.getLastName() != null && !p.getLastName().equals("")) p2.setLastName(p.getLastName());
+			if (p.getPhoneNumber() != null && !p.getPhoneNumber().equals("")) p2.setPhoneNumber(p.getPhoneNumber());
+			if (p.getAddress() != null && !p.getAddress().equals("")) p2.setAddress(p.getAddress());
 			
 			Gson responseGson = new Gson();
 			String responseBody = responseGson.toJson(p2);
