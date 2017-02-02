@@ -7,5 +7,4 @@ public class Test {
 	public Test() {
 		assertTrue(true);
 	}
-
 }
