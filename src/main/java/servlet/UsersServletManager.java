@@ -1,7 +1,7 @@
 package servlet;
 
 public class UsersServletManager extends AServletManager {
-
+	
 	public UsersServletManager(String filePath) {
 		super(filePath);
 		// nothing to do 
@@ -9,8 +9,7 @@ public class UsersServletManager extends AServletManager {
 
 	@Override
 	public void init() {
-		// nothing to do
-
+		parseConfigFile();
 	}
 
 	@Override

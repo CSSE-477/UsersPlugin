@@ -45,4 +45,10 @@ public class Person {
 	public void setAddress(String address) {
 		this.address = address;
 	}
+	
+	@Override
+	public String toString() {
+		return "Person [firstName=" + firstName + ", lastName=" + lastName + ", phoneNumber=" + phoneNumber
+				+ ", address=" + address + "]";
+	}
 }
