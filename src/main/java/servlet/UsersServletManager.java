@@ -15,6 +15,6 @@ public class UsersServletManager extends AServletManager {
 
 	@Override
 	public void destroy() {
-		// TODO Auto-generated method stub
+		//for(String s : servletMap.get)
 	}
 }
