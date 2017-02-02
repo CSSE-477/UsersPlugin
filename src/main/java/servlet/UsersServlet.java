@@ -3,6 +3,8 @@ package servlet;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.google.gson.Gson;
+
 import protocol.HttpRequest;
 import protocol.HttpResponseBuilder;
 import protocol.Protocol;
@@ -72,16 +74,53 @@ public class UsersServlet extends AHttpServlet {
 		}
 	}
 
-	@Override //Post Appends (replace a few fields)
+	@Override
 	public void doPost(HttpRequest request, HttpResponseBuilder responseBuilder) {
-		// TODO Auto-generated method stub
-
+		Protocol protocol = Protocol.getProtocol();
+		try {
+			String arg = request.getUri().toString().split("/")[3];
+			Integer index = Integer.parseInt(arg);
+			
+			String body = new String(request.getBody());
+			Gson gson = new Gson();
+			Person p = (Person) gson.fromJson(body, Person.class);
+			
+			Person p2 = this.usersMap.get(index);
+			
+			if (!p.getFirstName().equals("")) p2.setFirstName(p.getFirstName());
+			if (!p.getLastName().equals("")) p2.setLastName(p.getLastName());
+			if (!p.getPhoneNumber().equals("")) p2.setPhoneNumber(p.getPhoneNumber());
+			if (!p.getAddress().equals("")) p2.setAddress(p.getAddress());
+			
+			responseBuilder.setStatus(200).setPhrase(protocol.getStringRep(protocol.getCodeKeyword(200))).setBody(body);
+			
+		} catch (IndexOutOfBoundsException e) {
+			responseBuilder.setStatus(400).setPhrase(protocol.getStringRep(protocol.getCodeKeyword(400)));
+			SwsLogger.errorLogger.error("Unable to parse HTTP request. Sending 400 Bad Request.");
+		}
 	}
 
-	@Override //PUT replaces (replace or put all)
+	@Override
 	public void doPut(HttpRequest request, HttpResponseBuilder responseBuilder) {
-		// TODO Auto-generated method stub
-
+		Protocol protocol = Protocol.getProtocol();
+		try {
+			String arg = request.getUri().toString().split("/")[3];
+			Integer index = Integer.parseInt(arg);
+			
+			String body = new String(request.getBody());
+			Gson gson = new Gson();
+			Person p = (Person) gson.fromJson(body, Person.class);
+			
+			if(this.usersMap.containsKey(index)) this.usersMap.remove(index);
+			this.usersMap.put(index, p);
+			
+			responseBuilder.setStatus(200).setPhrase(protocol.getStringRep(protocol.getCodeKeyword(200))).setBody(body);
+			SwsLogger.accessLogger.info("Replaced user " + index + ". Sending 200 OK");
+			return;
+		} catch (IndexOutOfBoundsException e) {
+			responseBuilder.setStatus(400).setPhrase(protocol.getStringRep(protocol.getCodeKeyword(400)));
+			SwsLogger.errorLogger.error("Unable to parse HTTP request. Sending 400 Bad Request.");
+		}
 	}
 
 	@Override
@@ -97,6 +136,7 @@ public class UsersServlet extends AHttpServlet {
 				SwsLogger.accessLogger.info("Sending 204 NO CONTENT for DELETE request to user " + index);
 				return;
 			}
+			responseBuilder.setStatus(404).setPhrase(protocol.getStringRep(protocol.getCodeKeyword(204)));
 			SwsLogger.accessLogger.info("Sending 404 NOT FOUND for DELETE request on user " + index);
 			return;
 		} catch (Exception e) {
