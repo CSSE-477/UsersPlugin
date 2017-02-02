@@ -43,7 +43,10 @@ public class UsersServlet extends AHttpServlet {
 				SwsLogger.accessLogger.info("Unable to find user " + index + " sending 404 response");
 				return;
 			}
-			responseBuilder.setStatus(200).setPhrase(protocol.getStringRep(protocol.getCodeKeyword(200))).setBody(p.toString());
+			Gson responseGson = new Gson();
+			String responseBody = responseGson.toJson(p);
+			
+			responseBuilder.setStatus(200).setPhrase(protocol.getStringRep(protocol.getCodeKeyword(200))).setBody(responseBody);
 			SwsLogger.accessLogger.info("Sending 200OK for GET request to user " + index);
 			return;
 		} catch (IndexOutOfBoundsException e) {
@@ -61,7 +64,7 @@ public class UsersServlet extends AHttpServlet {
 			Integer index = Integer.parseInt(arg);
 			Person p = this.usersMap.get(index);
 			if (p != null) {
-				responseBuilder.setStatus(200).setPhrase(protocol.getStringRep(protocol.getCodeKeyword(200))).putHeader("Num. Users", this.usersMap.size() + "").putHeader("First Name", p.getFirstName()).putHeader("Last Name", p.getLastName()).putHeader("Phone Num.", p.getPhoneNumber());
+				responseBuilder.setStatus(200).setPhrase(protocol.getStringRep(protocol.getCodeKeyword(200))).putHeader("Num-Users", this.usersMap.size() + "").putHeader("First Name", p.getFirstName()).putHeader("Last Name", p.getLastName()).putHeader("Phone Num.", p.getPhoneNumber());
 				SwsLogger.accessLogger.info("Sending 200OK for HEAD request to user " + index);
 				return;
 			}
