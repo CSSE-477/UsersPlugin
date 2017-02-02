@@ -1,2 +1,2 @@
-/users,servlet.UsersServletManager
-/groups,servlet.GroupsServletManager
+/users,servlet.UsersServlet
+/groups,servlet.GroupsServlet
