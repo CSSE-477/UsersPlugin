@@ -4,7 +4,7 @@ public class UsersServletManager extends AServletManager {
 
 	public UsersServletManager(String filePath) {
 		super(filePath);
-		// notihng to do 
+		// nothing to do 
 	}
 
 	@Override
@@ -15,6 +15,8 @@ public class UsersServletManager extends AServletManager {
 
 	@Override
 	public void destroy() {
-		//for(String s : servletMap.get)
+		for(AHttpServlet servlet : servletMap.values()) {
+			servlet.destroy();
+		}
 	}
 }
