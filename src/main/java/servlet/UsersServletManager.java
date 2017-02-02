@@ -1,5 +1,7 @@
 package servlet;
 
+import java.io.File;
+
 public class UsersServletManager extends AServletManager {
 	
 	public UsersServletManager(String filePath) {
@@ -9,7 +11,7 @@ public class UsersServletManager extends AServletManager {
 
 	@Override
 	public void init() {
-		parseConfigFile();
+		this.configFile =  new File(this.getClass().getClassLoader().getResource("config.csv").getFile());
 	}
 
 	@Override
