@@ -1,11 +1,11 @@
 package servlet;
 
-import java.io.InputStream;
+import java.net.URLClassLoader;
 
 public class UsersServletManager extends AServletManager {
 	
-	public UsersServletManager(String filePath, InputStream configStream) {
-		super(filePath, configStream);
+	public UsersServletManager(String filePath, URLClassLoader loader) {
+		super(filePath, loader);
 		// nothing to do 
 	}
 
