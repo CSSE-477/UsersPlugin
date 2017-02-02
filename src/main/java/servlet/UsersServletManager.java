@@ -4,19 +4,17 @@ public class UsersServletManager extends AServletManager {
 
 	public UsersServletManager(String filePath) {
 		super(filePath);
-		// TODO Auto-generated constructor stub
+		// notihng to do 
 	}
 
 	@Override
 	public void init() {
-		// TODO Auto-generated method stub
+		// nothing to do
 
 	}
 
 	@Override
 	public void destroy() {
 		// TODO Auto-generated method stub
-
 	}
-
 }

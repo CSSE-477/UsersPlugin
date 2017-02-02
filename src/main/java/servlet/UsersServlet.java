@@ -3,10 +3,10 @@ package servlet;
 import protocol.HttpRequest;
 import protocol.HttpResponseBuilder;
 
-public class UsersServlet implements IHttpServlet {
+public class UsersServlet extends AHttpServlet {
 
-	public UsersServlet() {
-		// TODO Auto-generated constructor stub
+	public UsersServlet(String resourcePath) {
+		super(resourcePath);
 	}
 
 	@Override
