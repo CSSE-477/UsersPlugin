@@ -92,7 +92,10 @@ public class UsersServlet extends AHttpServlet {
 			if (!p.getPhoneNumber().equals("")) p2.setPhoneNumber(p.getPhoneNumber());
 			if (!p.getAddress().equals("")) p2.setAddress(p.getAddress());
 			
-			responseBuilder.setStatus(200).setPhrase(protocol.getStringRep(protocol.getCodeKeyword(200))).setBody(body);
+			Gson responseGson = new Gson();
+			String responseBody = responseGson.toJson(p2);
+			
+			responseBuilder.setStatus(200).setPhrase(protocol.getStringRep(protocol.getCodeKeyword(200))).setBody(responseBody);
 			
 		} catch (IndexOutOfBoundsException e) {
 			responseBuilder.setStatus(400).setPhrase(protocol.getStringRep(protocol.getCodeKeyword(400)));
@@ -114,7 +117,10 @@ public class UsersServlet extends AHttpServlet {
 			if(this.usersMap.containsKey(index)) this.usersMap.remove(index);
 			this.usersMap.put(index, p);
 			
-			responseBuilder.setStatus(200).setPhrase(protocol.getStringRep(protocol.getCodeKeyword(200))).setBody(body);
+			Gson responseGson = new Gson();
+			String responseBody = responseGson.toJson(p);
+			
+			responseBuilder.setStatus(200).setPhrase(protocol.getStringRep(protocol.getCodeKeyword(200))).setBody(responseBody);
 			SwsLogger.accessLogger.info("Replaced user " + index + ". Sending 200 OK");
 			return;
 		} catch (IndexOutOfBoundsException e) {
