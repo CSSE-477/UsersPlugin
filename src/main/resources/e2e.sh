@@ -1,7 +1,7 @@
 #!/bin/bash
 
-response=$(curl --write-out %{http_code} --silent localhost:8080)
-status_code=$(echo "$response" | sed -n '$p')
+response=$(curl --write-out %{http_code} --silent localhost:8080/userapp/users/1)
+status_code=$(echo "$response" | grep -oP '(200)')
 case "$status_code" in
 	200) echo 'curl success!'
 		 ;;
