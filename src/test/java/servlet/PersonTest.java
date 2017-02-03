@@ -47,7 +47,40 @@ public class PersonTest {
 	@Test
 	public void equalsTest() {
 		Person p = new Person("First", "Last", "1234567", "123 Main St.");
+		Person p2 = new Person("First", "Last", "1234567", "123 Main St.");
 		assertTrue(p.equals(p));
+		assertTrue(p.equals(p2));
+		assertFalse(p.equals(null));
+		assertFalse(p.equals(new Integer(1)));
+		
+		p.setAddress("");
+		assertFalse(p.equals(p2));
+		p2.setAddress("1");
+		assertFalse(p.equals(p2));
+		
+		p = new Person("First", "Last", "1234567", "123 Main St.");
+		p2 = new Person("First", "Last", "1234567", "123 Main St.");
+		
+		p.setPhoneNumber("");
+		assertFalse(p.equals(p2));
+		p2.setPhoneNumber("1");
+		assertFalse(p.equals(p2));
+		
+		p = new Person("First", "Last", "1234567", "123 Main St.");
+		p2 = new Person("First", "Last", "1234567", "123 Main St.");
+		
+		p.setFirstName("");
+		assertFalse(p.equals(p2));
+		p2.setFirstName("1");
+		assertFalse(p.equals(p2));
+		
+		p = new Person("First", "Last", "1234567", "123 Main St.");
+		p2 = new Person("First", "Last", "1234567", "123 Main St.");
+		
+		p.setLastName("");
+		assertFalse(p.equals(p2));
+		p2.setLastName("1");
+		assertFalse(p.equals(p2));
 	}
 
 }
