@@ -1,4 +1,4 @@
-# Users Directory Plugin for #Team YoloSwag Web Server
+# Users Directory Plugin for Team #YOLOSWAG *dabs*
 Jesse Shellabarger, Tayler How, Collin Trowbridge, Steve Trotta
 
 
