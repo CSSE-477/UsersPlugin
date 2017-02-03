@@ -105,6 +105,7 @@ public class UsersServlet extends AHttpServlet {
 				if (p.getAddress() != null && !p.getAddress().equals(""))
 					p2.setAddress(p.getAddress());
 			}
+			p2 = this.usersMap.get(index);
 			Gson responseGson = new Gson();
 			String responseBody = responseGson.toJson(p2);
 
