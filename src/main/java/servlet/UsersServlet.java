@@ -7,6 +7,7 @@ import com.google.gson.Gson;
 
 import protocol.HttpRequest;
 import protocol.HttpResponseBuilder;
+import protocol.Keywords;
 import protocol.Protocol;
 import utils.SwsLogger;
 
@@ -46,7 +47,7 @@ public class UsersServlet extends AHttpServlet {
 			Gson responseGson = new Gson();
 			String responseBody = responseGson.toJson(p);
 
-			responseBuilder.setStatus(200).setPhrase(protocol.getStringRep(protocol.getCodeKeyword(200)))
+			responseBuilder.setStatus(200).setPhrase(protocol.getStringRep(protocol.getCodeKeyword(200))).putHeader(protocol.getStringRep(Keywords.CONTENT_TYPE), "application/json")
 					.setBody(responseBody);
 			SwsLogger.accessLogger.info("Sending 200OK for GET request to user " + index);
 			return;
@@ -104,7 +105,7 @@ public class UsersServlet extends AHttpServlet {
 			Gson responseGson = new Gson();
 			String responseBody = responseGson.toJson(p2);
 
-			responseBuilder.setStatus(200).setPhrase(protocol.getStringRep(protocol.getCodeKeyword(200)))
+			responseBuilder.setStatus(200).setPhrase(protocol.getStringRep(protocol.getCodeKeyword(200))).putHeader(protocol.getStringRep(Keywords.CONTENT_TYPE), "application/json")
 					.setBody(responseBody);
 
 		} catch (IndexOutOfBoundsException e) {
@@ -131,7 +132,7 @@ public class UsersServlet extends AHttpServlet {
 			Gson responseGson = new Gson();
 			String responseBody = responseGson.toJson(p);
 
-			responseBuilder.setStatus(200).setPhrase(protocol.getStringRep(protocol.getCodeKeyword(200)))
+			responseBuilder.setStatus(200).setPhrase(protocol.getStringRep(protocol.getCodeKeyword(200))).putHeader(protocol.getStringRep(Keywords.CONTENT_TYPE), "application/json")
 					.setBody(responseBody);
 			SwsLogger.accessLogger.info("Replaced user " + index + ". Sending 200 OK");
 			return;
