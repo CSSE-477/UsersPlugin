@@ -92,16 +92,19 @@ public class UsersServlet extends AHttpServlet {
 			Person p = (Person) gson.fromJson(body, Person.class);
 
 			Person p2 = this.usersMap.get(index);
-
-			if (p.getFirstName() != null && !p.getFirstName().equals(""))
-				p2.setFirstName(p.getFirstName());
-			if (p.getLastName() != null && !p.getLastName().equals(""))
-				p2.setLastName(p.getLastName());
-			if (p.getPhoneNumber() != null && !p.getPhoneNumber().equals(""))
-				p2.setPhoneNumber(p.getPhoneNumber());
-			if (p.getAddress() != null && !p.getAddress().equals(""))
-				p2.setAddress(p.getAddress());
-
+			
+			if (p2 == null) {
+				this.usersMap.put(index, p);
+			} else {
+				if (p.getFirstName() != null && !p.getFirstName().equals(""))
+					p2.setFirstName(p.getFirstName());
+				if (p.getLastName() != null && !p.getLastName().equals(""))
+					p2.setLastName(p.getLastName());
+				if (p.getPhoneNumber() != null && !p.getPhoneNumber().equals(""))
+					p2.setPhoneNumber(p.getPhoneNumber());
+				if (p.getAddress() != null && !p.getAddress().equals(""))
+					p2.setAddress(p.getAddress());
+			}
 			Gson responseGson = new Gson();
 			String responseBody = responseGson.toJson(p2);
 
