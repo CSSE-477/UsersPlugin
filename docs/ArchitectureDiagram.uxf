@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.2">
+  <zoom_level>8</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>288</x>
+      <y>624</y>
+      <w>440</w>
+      <h>264</h>
+    </coordinates>
+    <panel_attributes>servlet::Person
+--
+-firstName: String
+-lastName: String
+-phoneNumber: String
+-address: String
+--
++Person(String firstName, String lastName, String phoneNumber, String address): ctor
++getFirstName(): String
++setFirstName(String firstName): void
++getLastName(): String
++setLastName(String lastName): void
++getPhoneNumber(): String
++setPhoneNumber(String phoneNumber): void
++getAddress(): String
++setAddress(String address): void
++toString(): String
++hashCode(): int
++equals(Object obj): boolean</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>848</x>
+      <y>624</y>
+      <w>160</w>
+      <h>168</h>
+    </coordinates>
+    <panel_attributes>servlet::Group
+--
+-members: List&lt;Person&gt;
+--
++Group(): ctor
++Group(Person p): ctor
++getMember(int i): Person
++addMember(Person p): void
++getSize(): int
++toString(): String
++hashCode(): int
++equals(Object obj): boolean
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>296</x>
+      <y>280</y>
+      <w>400</w>
+      <h>168</h>
+    </coordinates>
+    <panel_attributes>servlet::GroupsServlet
+--
+-groupsMap: Map&lt;Integer, Group&gt;
+--
++GroupsServlet(String resourcePath): ctor
++init(): void
++destroy(): void
++doGet(HttpRequest request, HttpResponseBuilder responseBuilder): void
++doHead(HttpRequest request, HttpResponseBuilder responseBuilder): void
++doPost(HttpRequest request, HttpResponseBuilder responseBuilder): void
++doPut(HttpRequest request, HttpResponseBuilder responseBuilder): void
++doDelete(HttpRequest request, HttpResponseBuilder responseBuilder): void</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>712</x>
+      <y>280</y>
+      <w>400</w>
+      <h>168</h>
+    </coordinates>
+    <panel_attributes>servlet::UsersServlet
+--
+-usersMap: Map&lt;Integer, Person&gt;
+--
++UsersServlet(String resourcePath): ctor
++init(): void
++destroy(): void
++doGet(HttpRequest request, HttpResponseBuilder responseBuilder): void
++doHead(HttpRequest request, HttpResponseBuilder responseBuilder): void
++doPost(HttpRequest request, HttpResponseBuilder responseBuilder): void
++doPut(HttpRequest request, HttpResponseBuilder responseBuilder): void
++doDelete(HttpRequest request, HttpResponseBuilder responseBuilder): void</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1128</x>
+      <y>320</y>
+      <w>360</w>
+      <h>88</h>
+    </coordinates>
+    <panel_attributes>servlet::UsersServletManager
+--
+--
++UsersServletManager(String filePath, URLClassLoader loader): ctor
++init(): void
++destroy(): void
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1128</x>
+      <y>56</y>
+      <w>344</w>
+      <h>192</h>
+    </coordinates>
+    <panel_attributes>/servlet::AServletManager/
+--
+#invokationMap: HashMap&lt;String, Method&gt;
+#servletMap: HashMap&lt;String, AHttpServlet&gt;
+#filePath: String
+#configStream: InputStream
+#CONFIG_DELIMETER = ",": String
+#URI_DELIMETER = "/": String
+--
++AServletManager(String filePath, InputStream configStream): ctor
++init(): void
++destroy(): void
++parseConfigFile(): boolean
++handleRequest(HttpRequest request): HttpResponse
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>480</x>
+      <y>48</y>
+      <w>400</w>
+      <h>168</h>
+    </coordinates>
+    <panel_attributes>/servlet::AHttpServlet/
+--
+#resourcePath: String
+--
++AHttpServlet(String resourcePath): ctor
++init(): void
++destroy(): void
++doGet(HttpRequest request, HttpResponseBuilder responseBuilder): void
++doHead(HttpRequest request, HttpResponseBuilder responseBuilder): void
++doPost(HttpRequest request, HttpResponseBuilder responseBuilder): void
++doPut(HttpRequest request, HttpResponseBuilder responseBuilder): void
++doDelete(HttpRequest request, HttpResponseBuilder responseBuilder): void</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>680</x>
+      <y>248</y>
+      <w>232</w>
+      <h>48</h>
+    </coordinates>
+    <panel_attributes>lt=-</panel_attributes>
+    <additional_attributes>10.0;10.0;270.0;10.0;270.0;40.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>480</x>
+      <y>208</y>
+      <w>232</w>
+      <h>88</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>270.0;10.0;270.0;60.0;10.0;60.0;10.0;90.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1304</x>
+      <y>240</y>
+      <w>24</w>
+      <h>96</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;100.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>480</x>
+      <y>440</y>
+      <w>248</w>
+      <h>200</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.</panel_attributes>
+    <additional_attributes>10.0;230.0;10.0;180.0;290.0;180.0;290.0;70.0;10.0;70.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>704</x>
+      <y>440</y>
+      <w>240</w>
+      <h>200</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.</panel_attributes>
+    <additional_attributes>280.0;230.0;280.0;180.0;10.0;180.0;10.0;70.0;280.0;70.0;280.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>904</x>
+      <y>64</y>
+      <w>208</w>
+      <h>64</h>
+    </coordinates>
+    <panel_attributes>AHttpServlet and AServletManager are 
+classes exposed by the 
+Server for use by plugins</panel_attributes>
+    <additional_attributes/>
+  </element>
+</diagram>
