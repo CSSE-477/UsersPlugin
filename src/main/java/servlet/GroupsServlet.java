@@ -7,6 +7,7 @@ import com.google.gson.Gson;
 
 import protocol.HttpRequest;
 import protocol.HttpResponseBuilder;
+import protocol.Keywords;
 import protocol.Protocol;
 import utils.SwsLogger;
 
@@ -50,7 +51,7 @@ public class GroupsServlet extends AHttpServlet {
 			String responseBody = responseGson.toJson(g);
 
 			responseBuilder.setStatus(200).setPhrase(protocol.getStringRep(protocol.getCodeKeyword(200)))
-					.setBody(responseBody);
+					.putHeader(protocol.getStringRep(Keywords.CONTENT_TYPE), "application/json").setBody(responseBody);
 			SwsLogger.accessLogger.info("Sending 200OK for GET request to group " + index);
 			return;
 		} catch (IndexOutOfBoundsException e) {
@@ -95,17 +96,16 @@ public class GroupsServlet extends AHttpServlet {
 			Person p = (Person) gson.fromJson(body, Person.class);
 			System.out.println(p.toString());
 
-			if(this.groupsMap.get(index) != null) {
+			if (this.groupsMap.get(index) != null) {
 				this.groupsMap.get(index).addMember(p);
-			}
-			else {
+			} else {
 				this.groupsMap.put(index, new Group(p));
 			}
 			Gson responseGson = new Gson();
 			String responseBody = responseGson.toJson(this.groupsMap.get(index));
 
 			responseBuilder.setStatus(200).setPhrase(protocol.getStringRep(protocol.getCodeKeyword(200)))
-					.setBody(responseBody);
+					.putHeader(protocol.getStringRep(Keywords.CONTENT_TYPE), "application/json").setBody(responseBody);
 
 		} catch (IndexOutOfBoundsException e) {
 			responseBuilder.setStatus(400).setPhrase(protocol.getStringRep(protocol.getCodeKeyword(400)));
@@ -132,7 +132,7 @@ public class GroupsServlet extends AHttpServlet {
 			String responseBody = responseGson.toJson(this.groupsMap.get(index));
 
 			responseBuilder.setStatus(200).setPhrase(protocol.getStringRep(protocol.getCodeKeyword(200)))
-					.setBody(responseBody);
+					.putHeader(protocol.getStringRep(Keywords.CONTENT_TYPE), "application/json").setBody(responseBody);
 			SwsLogger.accessLogger.info("Replaced Group " + index + ". Sending 200 OK");
 			return;
 		} catch (IndexOutOfBoundsException e) {
