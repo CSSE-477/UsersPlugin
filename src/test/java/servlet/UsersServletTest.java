@@ -39,6 +39,24 @@ public class UsersServletTest {
 	}
 	
 	@Test
+	public void testGetDoesntExist() throws Exception{
+		AHttpServlet servlet = new UsersServlet("Not Used");
+		servlet.init();
+		
+		String requestLine = "GET /userapp/users/4 HTTP/1.1\r";
+		InputStream in = new ByteArrayInputStream(requestLine.getBytes());
+		HttpRequest req = HttpRequest.read(in);
+		HttpResponseBuilder builder = new HttpResponseBuilder();
+		
+		servlet.doGet(req, builder);
+		HttpResponse response = builder.generateResponse();
+		
+		assertEquals(404, response.getStatus());
+		Protocol proto = Protocol.getProtocol();
+		assertEquals(proto.getStringRep(proto.getCodeKeyword(404)), response.getPhrase());
+	}
+	
+	@Test
 	public void testHead() throws Exception{
 		AHttpServlet servlet = new UsersServlet("Not Used");
 		servlet.init();
@@ -55,6 +73,24 @@ public class UsersServletTest {
 		Protocol proto = Protocol.getProtocol();
 		assertEquals(proto.getStringRep(proto.getCodeKeyword(200)), response.getPhrase());
 		assertEquals(3, Integer.parseInt(response.getHeader().get("Num-Users")));
+	}
+	
+	@Test
+	public void testHeadDoesntExist() throws Exception{
+		AHttpServlet servlet = new UsersServlet("Not Used");
+		servlet.init();
+		
+		String requestLine = "HEAD /userapp/users/5 HTTP/1.1\r\n";
+		InputStream in = new ByteArrayInputStream(requestLine.getBytes());
+		HttpRequest req = HttpRequest.read(in);
+		HttpResponseBuilder builder = new HttpResponseBuilder();
+		
+		servlet.doHead(req, builder);
+		HttpResponse response = builder.generateResponse();
+		
+		assertEquals(404, response.getStatus());
+		Protocol proto = Protocol.getProtocol();
+		assertEquals(proto.getStringRep(proto.getCodeKeyword(404)), response.getPhrase());
 	}
 	
 	@Test
@@ -92,7 +128,41 @@ public class UsersServletTest {
 	}
 	
 	@Test
-	public void testPut() throws Exception {
+	public void testPostWhereDoesntExist() throws Exception{
+		AHttpServlet servlet = new UsersServlet("Not Used");
+		servlet.init();
+		
+		String requestLine = "POST /userapp/users/4 HTTP/1.1\r\n";	
+		
+		InputStream in = new ByteArrayInputStream(requestLine.getBytes());
+		HttpRequest req = HttpRequest.read(in);
+		HttpResponseBuilder builder = new HttpResponseBuilder();
+		
+		Person samplePerson = new Person("", "", "", "1243 Changed Street");
+		Gson personGson = new Gson();
+		String reqBody = personGson.toJson(samplePerson);
+		
+		Field body = req.getClass().getDeclaredField("body");
+		body.setAccessible(true);
+		body.set(req,reqBody.toCharArray());
+		
+		
+		servlet.doPost(req, builder);
+		HttpResponse response = builder.generateResponse();
+		
+		assertEquals(200, response.getStatus());
+		Protocol proto = Protocol.getProtocol();
+		assertEquals(proto.getStringRep(proto.getCodeKeyword(200)), response.getPhrase());
+		
+		Person expectedPerson = new Person("", "", "", "1243 Changed Street");
+		String expected = new Gson().toJson(expectedPerson);
+		
+		
+		assertEquals(expected, response.getBody());
+	}
+	
+	@Test
+	public void testPutWhereExists() throws Exception {
 		AHttpServlet servlet = new UsersServlet("Not Used");
 		servlet.init();
 		
@@ -165,6 +235,25 @@ public class UsersServletTest {
 		servlet.doGet(req, builder);
 		response = builder.generateResponse();
 		
+		assertEquals(404, response.getStatus());
+		assertEquals(proto.getStringRep(proto.getCodeKeyword(404)), response.getPhrase());
+	}
+	
+	@Test
+	public void testDeleteWhereDoesntExist() throws Exception {
+		AHttpServlet servlet = new UsersServlet("Not Used");
+		servlet.init();
+		
+		String requestLine = "DELETE /userapp/users/5 HTTP/1.1\r\n";	
+		
+		InputStream in = new ByteArrayInputStream(requestLine.getBytes());
+		HttpRequest req = HttpRequest.read(in);
+		HttpResponseBuilder builder = new HttpResponseBuilder();
+		
+		servlet.doDelete(req, builder);
+		HttpResponse response = builder.generateResponse();
+		
+		Protocol proto = Protocol.getProtocol();
 		assertEquals(404, response.getStatus());
 		assertEquals(proto.getStringRep(proto.getCodeKeyword(404)), response.getPhrase());
 	}

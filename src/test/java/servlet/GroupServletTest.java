@@ -46,6 +46,34 @@ public class GroupServletTest {
 	}
 	
 	@Test
+	public void testGetWhereDoesntExist() throws Exception{
+		AHttpServlet servlet = new GroupsServlet("Not Used");
+		servlet.init();
+		
+		String requestLine = "GET /userapp/groups/1 HTTP/1.1\r\n";
+		InputStream in = new ByteArrayInputStream(requestLine.getBytes());
+		HttpRequest req = HttpRequest.read(in);
+		HttpResponseBuilder builder = new HttpResponseBuilder();
+		
+		servlet.doGet(req, builder);
+		HttpResponse response = builder.generateResponse();
+		
+		assertEquals(200, response.getStatus());
+		String jsonResponse = response.getBody();
+		System.out.println(jsonResponse);
+		Gson gson = new Gson();
+		Group actual = (Group) gson.fromJson(jsonResponse, Group.class);
+		
+		Person p1 = new Person("Adam", "Smith", "6143612", "1234 Street Road");
+		Person p2 = new Person("Some", "Guy", "4123651", "1 1st Street");
+		Group expected = new Group();
+		expected.addMember(p1);
+		expected.addMember(p2);
+		
+		assertEquals(expected, actual);
+	}
+	
+	@Test
 	public void testHead() throws Exception{
 		AHttpServlet servlet = new GroupsServlet("Not Used");
 		servlet.init();
@@ -63,6 +91,24 @@ public class GroupServletTest {
 		assertEquals(proto.getStringRep(proto.getCodeKeyword(200)), response.getPhrase());
 		assertEquals(1, Integer.parseInt(response.getHeader().get("Num-Groups")));
 		assertEquals(2, Integer.parseInt(response.getHeader().get("Num-Users-In-Group")));
+	}
+	
+	@Test
+	public void testHeadWhereDoesntExist() throws Exception{
+		AHttpServlet servlet = new GroupsServlet("Not Used");
+		servlet.init();
+		
+		String requestLine = "HEAD /userapp/groups/6 HTTP/1.1\r\n";
+		InputStream in = new ByteArrayInputStream(requestLine.getBytes());
+		HttpRequest req = HttpRequest.read(in);
+		HttpResponseBuilder builder = new HttpResponseBuilder();
+		
+		servlet.doHead(req, builder);
+		HttpResponse response = builder.generateResponse();
+		
+		assertEquals(404, response.getStatus());
+		Protocol proto = Protocol.getProtocol();
+		assertEquals(proto.getStringRep(proto.getCodeKeyword(404)), response.getPhrase());
 	}
 	
 	@Test
@@ -218,5 +264,23 @@ public class GroupServletTest {
 		
 		assertEquals(404, response.getStatus());
 	}
-
+	
+	@Test
+	public void testDeleteWhereDoesntExist() throws Exception {
+		AHttpServlet servlet = new GroupsServlet("Not Used");
+		servlet.init();
+		
+		String requestLine = "DELETE /userapp/groups/5 HTTP/1.1\r\n";	
+		
+		InputStream in = new ByteArrayInputStream(requestLine.getBytes());
+		HttpRequest req = HttpRequest.read(in);
+		HttpResponseBuilder builder = new HttpResponseBuilder();
+		
+		servlet.doDelete(req, builder);
+		HttpResponse response = builder.generateResponse();
+		
+		Protocol proto = Protocol.getProtocol();
+		assertEquals(404, response.getStatus());
+		assertEquals(proto.getStringRep(proto.getCodeKeyword(404)), response.getPhrase());
+	}
 }
