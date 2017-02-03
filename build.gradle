@@ -1,3 +1,7 @@
+plugins {
+	id 'org.hidetake.ssh' version '2.7.0'
+}
+
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
@@ -127,3 +131,67 @@ task codeCoverageInfo (dependsOn: jacocoTestReport) {
 	}
 }
 jacocoTestReport.finalizedBy(codeCoverageInfo)
+
+// SSH Publishing
+
+ssh.settings { knownHosts = allowAnyHosts }
+
+remotes {
+	deployment {
+		host = System.getenv('SSH_HOST')
+		user = System.getenv('SSH_USER')
+		password = System.getenv('SSH_PASSWORD')
+	}
+}
+
+task publishToWebServer(dependsOn: jar) << {
+	ssh.run {
+		session(remotes.deployment) {
+			println "Checking if remote /home/csse/YoloSwagSWS/bin/plugin exists ..."
+			def result = execute('if test -d /home/csse/YoloSwagSWS/bin/plugin; then echo "exists"; fi')						
+			if(result != "exists") {
+				println("Remote /home/csse/YoloSwagSWS/bin/plugin does not exist, build is failing...")
+				throw new GradleException('/home/csse/YoloSwagSWS/bin/plugin does not exist. Cannot drop the plugin.')
+			}
+			
+			println "Checking if UsersPlugin jar exists..."
+			result = execute('if test ! -f /home/csse/YoloSwagSWS/bin/plugin/UsersPlugin*.jar; then echo "notFound"; fi')						
+			if(result != "notFound") {
+				println "Stopping server to add jar..."
+				executeSudo('service webserver stop', pty: true)
+				println "Server stopped"
+
+				println "Removing UsersPlugin*.jar from /home/csse/YoloSwagSWS/bin/plugin ..."
+				executeSudo('rm /home/csse/YoloSwagSWS/bin/plugin/UsersPlugin*.jar', pty: true)
+
+				println "Starting service..."
+				executeSudo('service webserver start', pty: true)
+				println "Service started"		
+			}
+
+			result = execute('if test -d /tmp/UsersPlugin; then echo "exists"; fi')						
+			if(result != "exists") {
+				println("Remote /tmp/UsersPlugin does not exist, creating a new one...")
+				execute('mkdir -p /tmp/UsersPlugin')
+				println("Remote /tmp/UsersPlugin created!")
+			}			
+			println("Putting jar into /tmp/UsersPlugin ...")
+			put from: "${buildDir}/libs/*.jar", into: '/tmp/UsersPlugin'
+
+			println("Moving the jar into /home/csse/YoloSwagSWS/bin/plugin")
+			executeSudo('mv /tmp/UsersPlugin/*.jar /home/csse/YoloSwagSWS/bin/plugin', pty: true)
+			println("Successfully dropped jar into plugin directory!")
+			
+			sleep(3 * 1000)
+			println("Testing curl 200 response")
+			put from: "${projectDir}/src/main/resources/e2e.sh", into: '/tmp/UsersPlugin'
+			executeSudo('/bin/bash /tmp/UsersPlugin/e2e.sh', pty: true)
+			println("Success!")
+
+			println("Removing /tmp/UsersPlugin")
+			execute('rm -rf /tmp/UsersPlugin')
+			println("Successfully removed the /tmp/UsersPlugin directory")
+			println("YoloSwagDefaultPlugin has been deployed to " + System.getenv('SSH_HOST'))
+		}
+	}
+}
