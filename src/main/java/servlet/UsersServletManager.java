@@ -1,10 +1,8 @@
 package servlet;
 
-import java.net.URLClassLoader;
-
 public class UsersServletManager extends AServletManager {
 	
-	public UsersServletManager(String filePath, URLClassLoader loader) {
+	public UsersServletManager(String filePath, ClassLoader loader) {
 		super(filePath, loader);
 		// nothing to do 
 	}
