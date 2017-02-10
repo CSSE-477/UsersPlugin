@@ -1,6 +1,6 @@
 #!/bin/bash
 
-response=$(curl --k --compressed --write-out %{http_code} --silent https://localhost:8080/userapp/users/1)
+response=$(curl -k --compressed --write-out %{http_code} --silent https://localhost:8080/userapp/users/1)
 status_code=$(echo "$response" | grep -oP '(200)')
 case "$status_code" in
 	200) echo 'curl success!'
