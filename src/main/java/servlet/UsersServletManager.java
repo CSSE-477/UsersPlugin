@@ -14,8 +14,6 @@ public class UsersServletManager extends AServletManager {
 
 	@Override
 	public void destroy() {
-		for(AHttpServlet servlet : servletMap.values()) {
-			servlet.destroy();
-		}
+		//nothing to do
 	}
 }
