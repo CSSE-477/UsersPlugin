@@ -12,8 +12,4 @@ public class UsersServletManager extends AServletManager {
 		//nothing to do
 	}
 
-	@Override
-	public void destroy() {
-		//nothing to do
-	}
 }
